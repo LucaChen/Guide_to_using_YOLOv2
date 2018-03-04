@@ -1,3 +1,9 @@
+![alt text][image0]
+
+[//]: # (Image References)
+[image0]: ./images/drone_ascend.gif                   "drone ascending clip"  
+[image1]: ./images/predictions.png       "darknet detection from single image"  
+
 
 # Guide to using YOLOv2
 This reference is mainly to help me and colleagues when we need to use real-time object detection in our work. I have experience with classification and localization using deep neural networks, but this is my first time to implement a deep, real-time detector + localizer since I normally detect based on cues such as motion, shape, color (thermal channel), etc.  
@@ -11,7 +17,9 @@ and read the YOLO9000 paper:
 https://arxiv.org/abs/1612.08242  
 
 
-I developed a code-crush (I'm coining that term if it's not already being used) on YOLOv2 when I discovered the repo and saw that it was written in C and CUDA. Maybe I was so enthralled because I had been suffering through hell with TensorFlow, which I only use because Keras is so great. Though I have been coding in Python for several years, I still love the beauty, power, and simplicity (until I get segfaults that take me an hour to debug) of the C programming language. The darknet neural network framework is Open Source, fast, easy to compile and use, and supports both CPU and GPU.  
+I developed a code-crush on YOLOv2 when I discovered the repo and saw that it was written in C and CUDA. Maybe I was so enamored because I had been suffering through hell with TensorFlow, which I only use because Keras is so great. Though I have been coding in Python for several years, I still love the beauty, power, and simplicity (until I get segfaults that take me an hour to debug) of the C programming language. The darknet neural network framework is Open Source, fast, easy to compile and use, and supports both CPU and GPU. Best of all, it pairs well with Python, as you will see below.  
+
+![alt text][image1]  
 
 
 ### Training YOLO on VOC
@@ -75,9 +83,9 @@ Some of the information below was shamelessly taken from Nils's post and resolve
 I tested with this annotated dataset:  
 https://timebutt.github.io/content/other/NFPA_dataset.zip  
 
-The annotations for this image set is already in the YOLO version 2 format, but in the future, when I use "labelImg" to locate the training object bounding boxes, I will need to convert to the format expected by YOLOv2. This can be done with G. Ning's script found here: 
+The annotations for this image set is already in the YOLO version 2 format, but in the future, when I use "labelImg" to locate the training object bounding boxes, I will need to convert to the format expected by YOLOv2. This can be done with G. Ning's script found here:
 https://github.com/Guanghan/darknet/blob/master/scripts/convert.py  
-  
+
 
 ###### Create the train.txt and test.txt files
 These files contain the paths of the images. Nils Tijtgat provides a script (https://timebutt.github.io/static/how-to-train-yolov2-to-detect-custom-objects/) to create these two files. Be aware that you can set the variable "percentage_test" to determine the percentage of images to be set aside for the test set.  
@@ -96,7 +104,7 @@ Then enter the values in each respective file:
 nfpa.data:  
 ```
 classes= 1  
-train  = /home/username/darknet/train.txt 
+train  = /home/username/darknet/train.txt
 valid  = /home/username/darknet/test.txt
 names  = /home/username/darknet/cfg/nfpa.names
 backup = /home/username/darknet/backup/
@@ -176,13 +184,13 @@ weightfile = '../yolo-nfpa_1500.weights'
 files = [ darknet_path + '/data/fd_01.jpg',
           darknet_path + '/data/fd_02.jpg',
           darknet_path + '/data/fd_03.jpg' ]
-         
+
 thresh = 0.24
 hier_thresh = 0.5
 
 pyyolo.init(darknet_path, datacfg, cfgfile, weightfile)
 
-# camera 
+# camera
 print('----- test python API using a file')
 i = 0
 while i < len(files):
@@ -192,10 +200,10 @@ while i < len(files):
     img = imread(filename)
     img = img.transpose(2,0,1)
     c, h, w = img.shape[0], img.shape[1], img.shape[2]
-    # print w, h, c 
+    # print w, h, c
     data = img.ravel()/255.0
     data = np.ascontiguousarray(data, dtype=np.float32)
-    outputs = pyyolo.detect(w, h, c, data, thresh, hier_thresh)	
+    outputs = pyyolo.detect(w, h, c, data, thresh, hier_thresh)
     for output in outputs:
         print(output)
     i += 1
@@ -225,81 +233,99 @@ Note to self: An image of size 1200x829 resulted in a segfault, though the sever
 
 
 ##### Showing output images with bounding boxes  
-    
-Here is another version I made using skimage instead of cv2. It draws the bounding box on the image which is plotted with a simple plotting function custom_plots.py (not shown). You could just use skimage to show the images.  
+
+Here is another version I made using my custom drone detector model. I use the bounding box information returned by pyyolo to draw the bounding boxes with Numpy.  
 ```
+import os
 import pyyolo
 import numpy as np
 import sys
 from skimage.io import imread
-from skimage.draw import line_aa
 
 from sys import path as spath
-spath.append('/home/davros/py_drf')
+spath.append('/home/telemaque/1210SRD/py_drf')
 import custom_plots
 
 
-darknet_path = './darknet'
-datacfg = 'cfg/nfpa.data'
-cfgfile = 'cfg/yolo-nfpa.2.0.cfg'
-weightfile = '../yolo-nfpa_1500.weights'
-files = [ darknet_path + '/data/fd_01.jpg',
-          darknet_path + '/data/fd_02.jpg',
-          darknet_path + '/data/fd_03.jpg' ]
-         
-thresh = 0.24
-hier_thresh = 0.5
+# returns a file path generator for all files under data_dir
+def get_imgs(data_dir):
+    fileiter = (os.path.join(root, f)
+                for root, _, files in os.walk(data_dir)
+                for f in files)
+    return fileiter
+
+
+darknet_path = '/home/telemaque/200WSQ/Acq_and_Track/darknet'
+datacfg = darknet_path + '/cfg/phantom.data'
+cfgfile = darknet_path + '/cfg/yolo-phantom.2.0.cfg'
+weightfile = darknet_path + '/yolo-phantom_5100.weights'
+
+#indir = darknet_path + '/data/Phantom'
+#indir = '/home/telemaque/200WSQ/phantom_image_dataset/testvids/DSC_0014_resize'
+indir = '/home/telemaque/200WSQ/phantom_image_dataset/galaxyS7_154043/resize'
+outdir = darknet_path + '/results/phantom'
+
+fileiter = get_imgs(indir)
+pngs = [f for f in fileiter if os.path.splitext(f)[1] == '.png']
+
+###########################################
+# galaxyS7_154043 video
+lower = 150
+upper = 400
+###########################################
+
+
+files = sorted ([x for x in pngs
+                 if lower < int(x.split('/')[-1].split('.')[0]) < upper ])
+
+thresh = 0.3
+hier_thresh = 0.6
 
 pyyolo.init(darknet_path, datacfg, cfgfile, weightfile)
 
-# camera 
-print('----- test python API using a file')
 i = 0
 while i < len(files):
     filename = files[i]
     print(filename)
-    
+
     dispimg = imread(filename)
-    print(dispimg.shape, dispimg.dtype, dispimg[0,0,0])
+    #print(dispimg.shape, dispimg.dtype, dispimg[0,0,0])
     h, w, c = dispimg.shape
     img = np.rollaxis(dispimg, 2)
-    print(img.shape, img.dtype, img[0,0,0])
-    
+    #print(img.shape, img.dtype, img[0,0,0])
+
     data = img.ravel()/255.0
     data = np.ascontiguousarray(data, dtype=np.float32)
-    outputs = pyyolo.detect(w, h, c, data, thresh, hier_thresh)	
+    outputs = pyyolo.detect(w, h, c, data, thresh, hier_thresh)
     for output in outputs:
         print(output)
-        rr, cc, val = line_aa( output['top'], output['left'], output['bottom'], output['left'] )
-        dispimg[rr,cc,0] = val * 255
-        dispimg[rr,cc,1] = 0
-        dispimg[rr,cc,2] = 0
-        
-        rr, cc, val = line_aa( output['top'], output['left'], output['top'], output['right'] )
-        dispimg[rr,cc,0] = val * 255
-        dispimg[rr,cc,1] = 0
-        dispimg[rr,cc,2] = 0
-        
-        rr, cc, val = line_aa( output['top'], output['right'], output['bottom'], output['right'] )
-        dispimg[rr,cc,0] = val * 255
-        dispimg[rr,cc,1] = 0
-        dispimg[rr,cc,2] = 0
-        
-        rr, cc, val = line_aa( output['bottom'], output['left'], output['bottom'], output['right'] )
-        dispimg[rr,cc,0] = val * 255
-        dispimg[rr,cc,1] = 0
-        dispimg[rr,cc,2] = 0                
-        
-    ans = custom_plots.show_img_return_input(dispimg, ' ')
-        
+
+        # COLOR BOX WITH WIDTH w
+        w = 5
+        # top
+        dispimg[output['top']-w:output['top'], output['left']-w:output['right']+w, 0] = 255
+        dispimg[output['top']-w:output['top'], output['left']-w:output['right']+w, 1] = 0
+        dispimg[output['top']-w:output['top'], output['left']-w:output['right']+w, 2] = 0
+        # bottom
+        dispimg[output['bottom']-w:output['bottom'], output['left']-w:output['right']+w, 0] = 255
+        dispimg[output['bottom']-w:output['bottom'], output['left']-w:output['right']+w, 1] = 0
+        dispimg[output['bottom']-w:output['bottom'], output['left']-w:output['right']+w, 2] = 0
+        # left
+        dispimg[output['top']:output['bottom'], output['left']-w:output['left'], 0] = 255
+        dispimg[output['top']:output['bottom'], output['left']-w:output['left'], 1] = 0
+        dispimg[output['top']:output['bottom'], output['left']-w:output['left'], 2] = 0
+        # right
+        dispimg[output['top']:output['bottom'], output['right']:output['right']+w, 0] = 255
+        dispimg[output['top']:output['bottom'], output['right']:output['right']+w, 1] = 0
+        dispimg[output['top']:output['bottom'], output['right']:output['right']+w, 2] = 0
+
+    ifnum = str(i).zfill(4)
+    #ans = custom_plots.show_img_return_input(dispimg, ifnum, ask=False)
+    custom_plots.write_img(dispimg, ifnum, outdir)
+
     i += 1
 
 
 # free model
 pyyolo.cleanup()
 ```
-
-An output image is shown below:  
-![alt text](./images/detection.png?raw=true "Output")  
-
-
