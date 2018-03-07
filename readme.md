@@ -243,7 +243,7 @@ import sys
 from skimage.io import imread
 
 from sys import path as spath
-spath.append('/home/telemaque/1210SRD/py_drf')
+spath.append('/home/telemaque/py_drf')
 import custom_plots
 
 
@@ -255,14 +255,12 @@ def get_imgs(data_dir):
     return fileiter
 
 
-darknet_path = '/home/telemaque/200WSQ/Acq_and_Track/darknet'
+darknet_path = '/home/telemaque/Acq_and_Track/darknet'
 datacfg = darknet_path + '/cfg/phantom.data'
 cfgfile = darknet_path + '/cfg/yolo-phantom.2.0.cfg'
 weightfile = darknet_path + '/yolo-phantom_5100.weights'
 
-#indir = darknet_path + '/data/Phantom'
-#indir = '/home/telemaque/200WSQ/phantom_image_dataset/testvids/DSC_0014_resize'
-indir = '/home/telemaque/200WSQ/phantom_image_dataset/galaxyS7_154043/resize'
+indir = '/home/telemaque/phantom_image_dataset/galaxyS7_154043/resize'
 outdir = darknet_path + '/results/phantom'
 
 fileiter = get_imgs(indir)
