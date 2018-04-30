@@ -1,8 +1,8 @@
 ![alt text][image0]
 
 [//]: # (Image References)
-[image0]: ./images/drone_ascend.gif                   "drone ascending clip"  
-[image1]: ./images/predictions.png       "darknet detection from single image"  
+[image0]: ./images/drone_ascend_rm.gif                   "drone ascending clip"  
+[image1]: ./images/predictions_rm.png       "darknet detection from single image"  
 
 
 # Guide to using YOLOv2
