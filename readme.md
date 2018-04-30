@@ -234,7 +234,7 @@ Note to self: An image of size 1200x829 resulted in a segfault, though the sever
 
 ##### Showing output images with bounding boxes  
 
-Here is another version I made using my custom drone detector model. I use the bounding box information returned by pyyolo to draw the bounding boxes with Numpy.  
+Here is another version I made using a custom drone detector model. I use the bounding box information returned by pyyolo to draw the bounding boxes with Numpy.  
 ```
 import os
 import pyyolo
