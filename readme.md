@@ -4,8 +4,10 @@
 [image0]: ./images/drone_ascend_rm.gif                   "drone ascending clip"  
 [image1]: ./images/predictions_rm.png       "darknet detection from single image"  
 
-
 # Guide to using YOLOv2
+
+[ Using YOLOv3 instead? Go here for the guide: https://github.com/drforester/Custom_YOLOv3_Detectors ]  
+
 This reference is mainly to help me and colleagues when we need to use real-time object detection in our work. I have experience with classification and localization using deep neural networks, but this is my first time to implement a deep, real-time detector + localizer since I normally detect based on cues such as motion, shape, color (thermal channel), etc.  
 
 To learn about Joseph Redmon's YOLO:  
