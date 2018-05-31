@@ -84,6 +84,7 @@ Some of the information below was shamelessly taken from Nils's post and resolve
 ###### Create the image and labels dataset
 I tested with this annotated dataset:  
 https://timebutt.github.io/content/other/NFPA_dataset.zip  
+After downloading it, I placed it in the following directory: darknet/data/NFPA  
 
 The annotations for this image set is already in the YOLO version 2 format, but in the future, when I use "labelImg" to locate the training object bounding boxes, I will need to convert to the format expected by YOLOv2. This can be done with G. Ning's script found here:
 https://github.com/Guanghan/darknet/blob/master/scripts/convert.py  
